@@ -120,3 +120,6 @@ def receber():
 @app.route("/", methods=["GET"])
 def home():
     return "Bot Barril do Mar online!"
+
+if __name__ == "__main__":
+    app.run(port=5000, host="0.0.0.0", debug=True)
