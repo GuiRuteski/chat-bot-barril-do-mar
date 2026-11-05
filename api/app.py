@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 import requests
+import os
 
 app = Flask(__name__)
 
-TOKEN = "SEU_TOKEN_AQUI"
-PHONE_ID = "SEU_PHONE_ID_AQUI"
-VERIFY_TOKEN = "barril123"
+# SEGURO - Pega das variáveis da Vercel, não fica no código
+TOKEN = os.environ.get("TOKEN")
+PHONE_ID = os.environ.get("PHONE_ID")
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "barril123")
 
 CARDAPIO = {
     "11": ("X-Burguer", 30.00), "12": ("X-Bacon", 32.00), "13": ("X-Eggy", 32.00),
