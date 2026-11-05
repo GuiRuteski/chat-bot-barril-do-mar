@@ -1,15 +1,12 @@
 from flask import Flask, request, jsonify
 import requests
-import os
 
 app = Flask(__name__)
 
-# COLOQUE AQUI SEUS DADOS DO META
 TOKEN = "SEU_TOKEN_AQUI"
 PHONE_ID = "SEU_PHONE_ID_AQUI"
 VERIFY_TOKEN = "barril123"
 
-# CARDÁPIO - SEM SUCO
 CARDAPIO = {
     "11": ("X-Burguer", 30.00), "12": ("X-Bacon", 32.00), "13": ("X-Eggy", 32.00),
     "14": ("X-Salada", 32.00), "15": ("X-Tudo", 36.00),
@@ -56,16 +53,13 @@ MENUS = {
     "8": "🥟 PASTÉIS:\n81 Frango R$25\n82 Frango Catupiry R$28\n83 Carne R$25\n84 Carne Queijo R$28\n85 Queijo R$24\n86 Calabresa R$25\n87 Pizza R$30\n\n0 Menu | 9 Pedido",
 }
 
-# Memória simples por cliente
 carrinhos = {}
-etapas = {}
 
 def responder(msg, telefone):
     msg = msg.strip()
     if telefone not in carrinhos:
         carrinhos[telefone] = []
     carrinho = carrinhos[telefone]
-
     if msg == "0":
         return MENU_PRINCIPAL
     if msg in MENUS:
@@ -84,11 +78,9 @@ def responder(msg, telefone):
         texto += f"\nTotal: R${total:.2f}\n\nDigite 91 para finalizar\n92 Limpar | 0 Voltar"
         return texto
     if msg == "91":
-        return "Como vai ser?\nDigite:\n911 - Entrega\n912 - Retirada"
+        return "Como vai ser?\n911 - Entrega\n912 - Retirada"
     if msg == "911":
-        return "Qual bairro?\n1 - Boiçucanga - Taxa R$8\n2 - Camburi - Taxa R$12\n3 - Maresias - Taxa R$20\n\nDigite 1, 2 ou 3"
-    if msg in ["1", "2", "3"] and etapas.get(telefone) == "bairro":
-        pass
+        return "Qual bairro?\n1 - Boiçucanga - Taxa R$8\n2 - Camburi - Taxa R$12\n3 - Maresias - Taxa R$20"
     if msg == "912":
         return "✅ Retirada no Barril do Mar!\n\nQual forma de pagamento?\n1 Pix\n2 Crédito\n3 Débito\n4 Dinheiro\n\nDepois me manda seu nome."
     if msg == "92":
@@ -104,13 +96,13 @@ def enviar_whatsapp(telefone, texto):
     data = {"messaging_product": "whatsapp", "to": telefone, "type": "text", "text": {"body": texto}}
     requests.post(url, headers=headers, json=data)
 
-@app.route("/webhook", methods=["GET"])
+@app.route("/api/index", methods=["GET"])
 def verificar():
     if request.args.get("hub.verify_token") == VERIFY_TOKEN:
         return request.args.get("hub.challenge")
     return "Erro", 403
 
-@app.route("/webhook", methods=["POST"])
+@app.route("/api/index", methods=["POST"])
 def receber():
     data = request.json
     try:
@@ -123,5 +115,6 @@ def receber():
         pass
     return jsonify({"status": "ok"})
 
-if __name__ == "__main__":
-    app.run(port=5000)
+@app.route("/", methods=["GET"])
+def home():
+    return "Bot Barril do Mar online!"
