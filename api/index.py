@@ -4,7 +4,6 @@ import os
 
 app = Flask(__name__)
 
-# SEGURO - Pega das variáveis da Vercel, não fica no código
 TOKEN = os.environ.get("TOKEN")
 PHONE_ID = os.environ.get("PHONE_ID")
 VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "barril123")
@@ -48,7 +47,7 @@ MENUS = {
     "1": "🍔 HAMBÚRGUER:\n11 X-Burguer R$30\n12 X-Bacon R$32\n13 X-Eggy R$32\n14 X-Salada R$32\n15 X-Tudo R$36\n\n0 Menu | 9 Pedido",
     "2": "🍗 FRANGO:\n21 X-Frango R$32\n22 X-Frango Bacon R$34\n23 X-Frango Eggy R$34\n24 X-Frango Salada R$34\n25 X-Frango Tudo R$38\n\n0 Menu | 9 Pedido",
     "3": "⭐ ESPECIAIS:\n31 X-Boiçucanga R$38\n32 X-Barril do Mar R$54\n33 X-Barril do Boi R$60\n\n0 Menu | 9 Pedido",
-    "4": "🔥 COMBOS:\n41 Combo X-Bacon R$42\n42 Combo Casal R$85\n43 Combo Barril do Mar R$68\n44 Combo Trio R$119\n45 Combo Família Barril R$179,90\n4x X-Tudo + 2x Batata 400g + Coca 2L\n\n0 Menu | 9 Pedido",
+    "4": "🔥 COMBOS:\n41 Combo X-Bacon R$42\n42 Combo Casal R$85\n43 Combo Barril do Mar R$68\n44 Combo Trio R$119\n45 Combo Família Barril R$179,90\n\n0 Menu | 9 Pedido",
     "5": "➕ ADICIONAIS:\n51 Hambúrguer R$3 | 52 Frango R$3 | 53 Queijo R$3\n54 Presunto R$3 | 55 Ovo R$3 | 56 Bacon R$3\n57 Cebola R$3 | 58 Tomate R$3 | 59 Linguiça R$3\n510 Catupiry R$5 | 511 Ketchup R$0,50 | 512 Maionese R$0,50 | 513 Patê Alho R$1\n\n0 Menu | 9 Pedido",
     "6": "🥤 BEBIDAS:\n61 Coca Lata R$8\n62 Coca Zero Lata R$8\n63 Coca 2L R$18\n64 Refrigerante 2L R$18\n66 Água R$6\n67 Água com Gás R$8\n\n0 Menu | 9 Pedido",
     "7": "🍟 PORÇÕES:\n71 Batata 200g R$18\n72 Batata 400g R$28\n73 Frango a Passarinho R$45\n74 Pururuca R$35\n\n0 Menu | 9 Pedido",
@@ -98,12 +97,15 @@ def enviar_whatsapp(telefone, texto):
     data = {"messaging_product": "whatsapp", "to": telefone, "type": "text", "text": {"body": texto}}
     requests.post(url, headers=headers, json=data)
 
+# AQUI ESTAVA O ERRO - AGORA RESPONDE NOS 2 CAMINHOS
+@app.route("/webhook", methods=["GET"])
 @app.route("/api/index", methods=["GET"])
 def verificar():
     if request.args.get("hub.verify_token") == VERIFY_TOKEN:
         return request.args.get("hub.challenge")
     return "Erro", 403
 
+@app.route("/webhook", methods=["POST"])
 @app.route("/api/index", methods=["POST"])
 def receber():
     data = request.json
